@@ -105,7 +105,7 @@ export default function SettingsPage() {
 
   // ── Updates ─────────────────────────────────────────────────────────────────
   type UpdateStatus = {
-    status: 'checking' | 'available' | 'up-to-date' | 'downloading' | 'ready-to-install' | 'error' | 'dev-mode';
+    status: 'checking' | 'available' | 'up-to-date' | 'downloading' | 'ready-to-install' | 'error' | 'dev-mode' | 'store';
     version?: string;
     percent?: number;
     error?: string;
@@ -1469,12 +1469,14 @@ export default function SettingsPage() {
               <h2 className="font-semibold text-gray-900">Software Updates</h2>
             </div>
             <p className="text-sm text-gray-500 mb-6">
-              Flo Desktop checks for updates automatically. You can also check manually below.
+              {updateStatus?.status === 'store'
+                ? 'This version is distributed via the App Store. Updates are managed by the store.'
+                : 'Flo Desktop checks for updates automatically. You can also check manually below.'}
             </p>
 
-            {updateStatus && (
+            {updateStatus && updateStatus.status !== 'store' && (
               <div className={`p-4 rounded-lg mb-4 ${
-                updateStatus.status === 'available' || updateStatus.status === 'ready-to-install' 
+                updateStatus.status === 'available' || updateStatus.status === 'ready-to-install'
                   ? 'bg-green-50 border border-green-200'
                   : updateStatus.status === 'error'
                   ? 'bg-red-50 border border-red-200'
@@ -1498,8 +1500,8 @@ export default function SettingsPage() {
                 {updateStatus.percent !== undefined && (
                   <div className="mt-2">
                     <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-brand h-2 rounded-full transition-all" 
+                      <div
+                        className="bg-brand h-2 rounded-full transition-all"
                         style={{ width: `${updateStatus.percent}%` }}
                       />
                     </div>
@@ -1518,14 +1520,16 @@ export default function SettingsPage() {
               </div>
             )}
 
-            <button
-              onClick={handleCheckUpdates}
-              disabled={updateStatus?.status === 'checking' || updateStatus?.status === 'downloading'}
-              className="px-4 py-2 bg-brand text-white rounded-lg hover:opacity-90 disabled:opacity-50 text-sm font-medium flex items-center gap-2"
-            >
-              <RefreshCw size={16} className={updateStatus?.status === 'checking' ? 'animate-spin' : ''} />
-              {updateStatus?.status === 'checking' ? 'Checking...' : 'Check for Updates'}
-            </button>
+            {updateStatus?.status !== 'store' && (
+              <button
+                onClick={handleCheckUpdates}
+                disabled={updateStatus?.status === 'checking' || updateStatus?.status === 'downloading'}
+                className="px-4 py-2 bg-brand text-white rounded-lg hover:opacity-90 disabled:opacity-50 text-sm font-medium flex items-center gap-2"
+              >
+                <RefreshCw size={16} className={updateStatus?.status === 'checking' ? 'animate-spin' : ''} />
+                {updateStatus?.status === 'checking' ? 'Checking...' : 'Check for Updates'}
+              </button>
+            )}
           </div>
         </TabsContent>
         {/* ================================================================
